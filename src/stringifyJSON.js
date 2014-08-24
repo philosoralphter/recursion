@@ -6,13 +6,12 @@ var stringifyJSON = function(obj) {
 
   var resultString = '';
 
-  //Skip functions and 'undefined'
+  //Skip functions and 'undefined' properties
   if (Object.prototype.toString.call(obj) == "[object Function]" || obj === undefined){
   	return;
   }
 
-
-  //Non-nested values
+  //******If Non-nested value
   //If not Object nor Array
   if (Object.prototype.toString.call(obj) !== "[object Object]" && !Array.isArray(obj)){
   	
@@ -23,8 +22,9 @@ var stringifyJSON = function(obj) {
   }
 
 
-  //Nested values
-  //If Array
+  //*****If Nested values ie: obj is collection*****
+  
+  //***If Array
   if(Array.isArray(obj)){
 	resultString += '[';
 	for (var i=0; i<obj.length; i++){
@@ -34,16 +34,29 @@ var stringifyJSON = function(obj) {
     resultString +=']';
   }
 
-  //If Object
+  //***If Object
   if (Object.prototype.toString.call(obj) == '[object Object]'){
-	  resultString += '{';
-	  //var keys = Object.keys(obj);
 
+	resultString += '{';
+
+    //if object not empty:
+    if (Object.keys(obj).length > 0){
 	  for (var prop in obj){
-	  	console.log(prop);
+	  	
+	  	//Skip functions and 'undefined'
+        if (Object.prototype.toString.call(obj[prop]) === "[object Function]" || obj[prop] === undefined){
+  	      continue;
+        }
+	    resultString +=  '"' + prop + '"' +':'+ stringifyJSON(obj[prop]) + ',';
 	  }
 
-	  return resultString + '}';
+	  //remove last ',' if present
+	  if (resultString.charAt(resultString.length-1) === ','){
+	   resultString = resultString.slice(0, -1); 
+	  }
+	}
+
+	resultString += '}';
   }
 
   return resultString;
